@@ -1,0 +1,1843 @@
+// Sources flattened with hardhat v2.9.3 https://hardhat.org
+
+// File @openzeppelin/contracts/token/ERC20/IERC20.sol@v4.6.0
+
+// -License-Identifier: MIT
+// OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Interface of the ERC20 standard as defined in the EIP.
+ */
+interface IERC20 {
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `to`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address to, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Moves `amount` tokens from `from` to `to` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) external returns (bool);
+}
+
+
+// File @openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol@v4.6.0
+
+// -License-Identifier: MIT
+// OpenZeppelin Contracts v4.4.1 (token/ERC20/extensions/IERC20Metadata.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Interface for the optional metadata functions from the ERC20 standard.
+ *
+ * _Available since v4.1._
+ */
+interface IERC20Metadata is IERC20 {
+    /**
+     * @dev Returns the name of the token.
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the symbol of the token.
+     */
+    function symbol() external view returns (string memory);
+
+    /**
+     * @dev Returns the decimals places of the token.
+     */
+    function decimals() external view returns (uint8);
+}
+
+
+// File @openzeppelin/contracts/utils/Address.sol@v4.6.0
+
+// -License-Identifier: MIT
+// OpenZeppelin Contracts (last updated v4.5.0) (utils/Address.sol)
+
+pragma solidity ^0.8.1;
+
+/**
+ * @dev Collection of functions related to the address type
+ */
+library Address {
+    /**
+     * @dev Returns true if `account` is a contract.
+     *
+     * [IMPORTANT]
+     * ====
+     * It is unsafe to assume that an address for which this function returns
+     * false is an externally-owned account (EOA) and not a contract.
+     *
+     * Among others, `isContract` will return false for the following
+     * types of addresses:
+     *
+     *  - an externally-owned account
+     *  - a contract in construction
+     *  - an address where a contract will be created
+     *  - an address where a contract lived, but was destroyed
+     * ====
+     *
+     * [IMPORTANT]
+     * ====
+     * You shouldn't rely on `isContract` to protect against flash loan attacks!
+     *
+     * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets
+     * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract
+     * constructor.
+     * ====
+     */
+    function isContract(address account) internal view returns (bool) {
+        // This method relies on extcodesize/address.code.length, which returns 0
+        // for contracts in construction, since the code is only stored at the end
+        // of the constructor execution.
+
+        return account.code.length > 0;
+    }
+
+    /**
+     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
+     * `recipient`, forwarding all available gas and reverting on errors.
+     *
+     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
+     * of certain opcodes, possibly making contracts go over the 2300 gas limit
+     * imposed by `transfer`, making them unable to receive funds via
+     * `transfer`. {sendValue} removes this limitation.
+     *
+     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
+     *
+     * IMPORTANT: because control is transferred to `recipient`, care must be
+     * taken to not create reentrancy vulnerabilities. Consider using
+     * {ReentrancyGuard} or the
+     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+     */
+    function sendValue(address payable recipient, uint256 amount) internal {
+        require(address(this).balance >= amount, "Address: insufficient balance");
+
+        (bool success, ) = recipient.call{value: amount}("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+    }
+
+    /**
+     * @dev Performs a Solidity function call using a low level `call`. A
+     * plain `call` is an unsafe replacement for a function call: use this
+     * function instead.
+     *
+     * If `target` reverts with a revert reason, it is bubbled up by this
+     * function (like regular Solidity function calls).
+     *
+     * Returns the raw returned data. To convert to the expected return value,
+     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
+     *
+     * Requirements:
+     *
+     * - `target` must be a contract.
+     * - calling `target` with `data` must not revert.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionCall(target, data, "Address: low-level call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+     * `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, 0, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but also transferring `value` wei to `target`.
+     *
+     * Requirements:
+     *
+     * - the calling contract must have an ETH balance of at least `value`.
+     * - the called Solidity function must be `payable`.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+     * with `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        require(address(this).balance >= value, "Address: insufficient balance for call");
+        require(isContract(target), "Address: call to non-contract");
+
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+        return functionStaticCall(target, data, "Address: low-level static call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal view returns (bytes memory) {
+        require(isContract(target), "Address: static call to non-contract");
+
+        (bool success, bytes memory returndata) = target.staticcall(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        require(isContract(target), "Address: delegate call to non-contract");
+
+        (bool success, bytes memory returndata) = target.delegatecall(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the
+     * revert reason using the provided one.
+     *
+     * _Available since v4.3._
+     */
+    function verifyCallResult(
+        bool success,
+        bytes memory returndata,
+        string memory errorMessage
+    ) internal pure returns (bytes memory) {
+        if (success) {
+            return returndata;
+        } else {
+            // Look for revert reason and bubble it up if present
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert(errorMessage);
+            }
+        }
+    }
+}
+
+
+// File @openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol@v4.6.0
+
+// -License-Identifier: MIT
+// OpenZeppelin Contracts v4.4.1 (token/ERC20/utils/SafeERC20.sol)
+
+pragma solidity ^0.8.0;
+
+
+/**
+ * @title SafeERC20
+ * @dev Wrappers around ERC20 operations that throw on failure (when the token
+ * contract returns false). Tokens that return no value (and instead revert or
+ * throw on failure) are also supported, non-reverting calls are assumed to be
+ * successful.
+ * To use this library you can add a `using SafeERC20 for IERC20;` statement to your contract,
+ * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
+ */
+library SafeERC20 {
+    using Address for address;
+
+    function safeTransfer(
+        IERC20 token,
+        address to,
+        uint256 value
+    ) internal {
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
+    }
+
+    function safeTransferFrom(
+        IERC20 token,
+        address from,
+        address to,
+        uint256 value
+    ) internal {
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+    }
+
+    /**
+     * @dev Deprecated. This function has issues similar to the ones found in
+     * {IERC20-approve}, and its usage is discouraged.
+     *
+     * Whenever possible, use {safeIncreaseAllowance} and
+     * {safeDecreaseAllowance} instead.
+     */
+    function safeApprove(
+        IERC20 token,
+        address spender,
+        uint256 value
+    ) internal {
+        // safeApprove should only be called when setting an initial allowance,
+        // or when resetting it to zero. To increase and decrease it, use
+        // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
+        require(
+            (value == 0) || (token.allowance(address(this), spender) == 0),
+            "SafeERC20: approve from non-zero to non-zero allowance"
+        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
+    }
+
+    function safeIncreaseAllowance(
+        IERC20 token,
+        address spender,
+        uint256 value
+    ) internal {
+        uint256 newAllowance = token.allowance(address(this), spender) + value;
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+    }
+
+    function safeDecreaseAllowance(
+        IERC20 token,
+        address spender,
+        uint256 value
+    ) internal {
+        unchecked {
+            uint256 oldAllowance = token.allowance(address(this), spender);
+            require(oldAllowance >= value, "SafeERC20: decreased allowance below zero");
+            uint256 newAllowance = oldAllowance - value;
+            _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+        }
+    }
+
+    /**
+     * @dev Imitates a Solidity high-level call (i.e. a regular function call to a contract), relaxing the requirement
+     * on the return value: the return value is optional (but if data is returned, it must not be false).
+     * @param token The token targeted by the call.
+     * @param data The call data (encoded using abi.encode or one of its variants).
+     */
+    function _callOptionalReturn(IERC20 token, bytes memory data) private {
+        // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
+        // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
+        // the target address contains contract code and also asserts for success in the low-level call.
+
+        bytes memory returndata = address(token).functionCall(data, "SafeERC20: low-level call failed");
+        if (returndata.length > 0) {
+            // Return data is optional
+            require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
+        }
+    }
+}
+
+
+// File @openzeppelin/contracts/utils/math/SafeMath.sol@v4.6.0
+
+// -License-Identifier: MIT
+// OpenZeppelin Contracts (last updated v4.6.0) (utils/math/SafeMath.sol)
+
+pragma solidity ^0.8.0;
+
+// CAUTION
+// This version of SafeMath should only be used with Solidity 0.8 or later,
+// because it relies on the compiler's built in overflow checks.
+
+/**
+ * @dev Wrappers over Solidity's arithmetic operations.
+ *
+ * NOTE: `SafeMath` is generally not needed starting with Solidity 0.8, since the compiler
+ * now has built in overflow checking.
+ */
+library SafeMath {
+    /**
+     * @dev Returns the addition of two unsigned integers, with an overflow flag.
+     *
+     * _Available since v3.4._
+     */
+    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        unchecked {
+            uint256 c = a + b;
+            if (c < a) return (false, 0);
+            return (true, c);
+        }
+    }
+
+    /**
+     * @dev Returns the subtraction of two unsigned integers, with an overflow flag.
+     *
+     * _Available since v3.4._
+     */
+    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        unchecked {
+            if (b > a) return (false, 0);
+            return (true, a - b);
+        }
+    }
+
+    /**
+     * @dev Returns the multiplication of two unsigned integers, with an overflow flag.
+     *
+     * _Available since v3.4._
+     */
+    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        unchecked {
+            // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+            // benefit is lost if 'b' is also tested.
+            // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+            if (a == 0) return (true, 0);
+            uint256 c = a * b;
+            if (c / a != b) return (false, 0);
+            return (true, c);
+        }
+    }
+
+    /**
+     * @dev Returns the division of two unsigned integers, with a division by zero flag.
+     *
+     * _Available since v3.4._
+     */
+    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        unchecked {
+            if (b == 0) return (false, 0);
+            return (true, a / b);
+        }
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers, with a division by zero flag.
+     *
+     * _Available since v3.4._
+     */
+    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        unchecked {
+            if (b == 0) return (false, 0);
+            return (true, a % b);
+        }
+    }
+
+    /**
+     * @dev Returns the addition of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `+` operator.
+     *
+     * Requirements:
+     *
+     * - Addition cannot overflow.
+     */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a + b;
+    }
+
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     *
+     * - Subtraction cannot overflow.
+     */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a - b;
+    }
+
+    /**
+     * @dev Returns the multiplication of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `*` operator.
+     *
+     * Requirements:
+     *
+     * - Multiplication cannot overflow.
+     */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a * b;
+    }
+
+    /**
+     * @dev Returns the integer division of two unsigned integers, reverting on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator.
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a / b;
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * reverting when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a % b;
+    }
+
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
+     * overflow (when the result is negative).
+     *
+     * CAUTION: This function is deprecated because it requires allocating memory for the error
+     * message unnecessarily. For custom revert reasons use {trySub}.
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     *
+     * - Subtraction cannot overflow.
+     */
+    function sub(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
+        unchecked {
+            require(b <= a, errorMessage);
+            return a - b;
+        }
+    }
+
+    /**
+     * @dev Returns the integer division of two unsigned integers, reverting with custom message on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function div(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
+        unchecked {
+            require(b > 0, errorMessage);
+            return a / b;
+        }
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * reverting with custom message when dividing by zero.
+     *
+     * CAUTION: This function is deprecated because it requires allocating memory for the error
+     * message unnecessarily. For custom revert reasons use {tryMod}.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     *
+     * - The divisor cannot be zero.
+     */
+    function mod(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
+        unchecked {
+            require(b > 0, errorMessage);
+            return a % b;
+        }
+    }
+}
+
+
+// File @openzeppelin/contracts/access/IAccessControl.sol@v4.6.0
+
+// -License-Identifier: MIT
+// OpenZeppelin Contracts v4.4.1 (access/IAccessControl.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev External interface of AccessControl declared to support ERC165 detection.
+ */
+interface IAccessControl {
+    /**
+     * @dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`
+     *
+     * `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite
+     * {RoleAdminChanged} not being emitted signaling this.
+     *
+     * _Available since v3.1._
+     */
+    event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole);
+
+    /**
+     * @dev Emitted when `account` is granted `role`.
+     *
+     * `sender` is the account that originated the contract call, an admin role
+     * bearer except when using {AccessControl-_setupRole}.
+     */
+    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);
+
+    /**
+     * @dev Emitted when `account` is revoked `role`.
+     *
+     * `sender` is the account that originated the contract call:
+     *   - if using `revokeRole`, it is the admin role bearer
+     *   - if using `renounceRole`, it is the role bearer (i.e. `account`)
+     */
+    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);
+
+    /**
+     * @dev Returns `true` if `account` has been granted `role`.
+     */
+    function hasRole(bytes32 role, address account) external view returns (bool);
+
+    /**
+     * @dev Returns the admin role that controls `role`. See {grantRole} and
+     * {revokeRole}.
+     *
+     * To change a role's admin, use {AccessControl-_setRoleAdmin}.
+     */
+    function getRoleAdmin(bytes32 role) external view returns (bytes32);
+
+    /**
+     * @dev Grants `role` to `account`.
+     *
+     * If `account` had not been already granted `role`, emits a {RoleGranted}
+     * event.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role``'s admin role.
+     */
+    function grantRole(bytes32 role, address account) external;
+
+    /**
+     * @dev Revokes `role` from `account`.
+     *
+     * If `account` had been granted `role`, emits a {RoleRevoked} event.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role``'s admin role.
+     */
+    function revokeRole(bytes32 role, address account) external;
+
+    /**
+     * @dev Revokes `role` from the calling account.
+     *
+     * Roles are often managed via {grantRole} and {revokeRole}: this function's
+     * purpose is to provide a mechanism for accounts to lose their privileges
+     * if they are compromised (such as when a trusted device is misplaced).
+     *
+     * If the calling account had been granted `role`, emits a {RoleRevoked}
+     * event.
+     *
+     * Requirements:
+     *
+     * - the caller must be `account`.
+     */
+    function renounceRole(bytes32 role, address account) external;
+}
+
+
+// File contracts/interfaces/IAdmin.sol
+
+//-License-Identifier: UNLICENSED
+pragma solidity ^0.8.3;
+
+interface IAdmin is IAccessControl {
+
+    struct RoleInfo {
+        address admin;
+        bytes32 role;
+        bool enabled;
+    }
+    event AddRole(address sender, address admin, bytes32 role);
+    event RemoveRole(address sender, address admin, bytes32 role);
+    event DisableRole(address sender, address admin, bytes32 role);
+    event EnableRole(address sender, address admin, bytes32 role);
+
+    function changeOwner(address _owner) external;
+
+    function addRole(bytes32 _role, address _admin) external;
+
+    function removeRole(bytes32 _role, address _admin) external;
+
+    function updateRole(bytes32 _role, address _preAdmin, address _admin) external;
+
+    function disableRole(bytes32 _role, address _admin) external;
+
+    function enabledRole(bytes32 _role, address _admin) external;
+
+    function checkRole(bytes32 _role) external view ;
+
+    function getRoles() external view returns (RoleInfo[] memory) ;
+
+    function isOwner(address _admin) external view returns (bool);
+
+    function isSaleAdmin(address _admin) external view returns (bool);
+
+    function isUserAdmin(address _admin) external view returns (bool);
+
+    function isConfigAdmin(address _admin) external view returns (bool);
+
+    function isStakingAdmin(address _admin) external view returns (bool);
+
+    function isIVYLAdmin(address _admin) external view returns (bool);
+
+    function isLpAdmin(address _admin) external view returns (bool);
+
+    function isSaleProtectAdmin(address _admin) external  view returns (bool);
+
+}
+
+
+// File contracts/interfaces/IConfig.sol
+
+//-License-Identifier: UNLICENSED
+pragma solidity ^0.8.3;
+
+interface IConfig {
+    function saleFactoryContract() external view returns (address);
+
+    function priceProtectContract() external view returns (address);
+
+    function devRewardContract() external view returns (address);
+
+    function adminContract() external view returns (address);
+
+    function userContract() external view returns (address);
+
+    function IVYL() external view returns (address);
+
+    function idoStakingContract() external view returns (address);
+
+    function lpStakingContract() external view returns (address);
+    //更新用户的下个可参加IDO的时间
+    function updateCoolingOffPeriodFor(address user, uint256 coolingOffTs) external;
+
+    function setParameter(bytes32 key, bytes32 value) external;
+
+    function setNormalPenaltyFeeAddress(address) external;
+
+    function setIDOPenaltyFeeAddress(address) external;
+
+    function setIDORegFeeAddress(address) external;
+
+    //添加签名机地址
+    function addSignatureMakerAddress(address _addr) external;
+    //移除签名机地址
+    function removeSignatureMakerAddress(address _addr) external;
+
+    function setUserPurchaseFeeAddress(address) external;
+    //设置项目方提款手续费归集地址
+    function setProjectWithdrawFeeAddress(address) external;
+    //冷却期
+    function setCoolingOffPeriod(uint256) external;
+
+    function getParameter(bytes32) external view returns (bytes32);
+
+    function getNormalPenaltyFeeAddress() external view returns (address);
+
+    function getIDOPenaltyFeeAddress() external view returns (address);
+
+    function getIDORegFeeAddress() external view returns (address);
+
+    function getCoolingOffPeriod() external view returns (uint256);
+
+    function getCoolingOffPeriodFor(address user) external view returns (uint256);
+    //批量获得签名机地址
+    function getSignatureMakerAddresses() external view returns (address[] memory);
+    //判断是否是签名机地址
+    function isSignatureMakerAddress(address _addr) external view returns (bool);
+    //用户购买IDO手续费归集地址
+    function getUserPurchaseFeeAddress() external view returns (address);
+    //项目方提款手续费归集地址
+    function getProjectWithdrawFeeAddress() external view returns (address);
+    //判断地址是否是销售合约地址
+    function isSale(address) external view returns (bool);
+
+    event ParametersUpdated(bytes32 indexed key, bytes32 value);
+    event UserCoolingOffUpdated(address indexed user, uint256 value);
+
+
+}
+
+
+// File contracts/sale/SaleConfig.sol
+
+//-License-Identifier: Unlicense
+pragma solidity ^0.8.3;
+
+
+
+
+
+contract SaleConfig {
+    using SafeMath for uint256;
+    using SafeERC20 for IERC20;
+    enum RoundType {
+        ValidatorRound,
+        StakingRound,
+        PublicRound,
+        AirdropRound
+    }
+
+    struct RoundInfo {
+        uint256 registerStartTime;
+        uint256 registerEndTime;
+        uint256 saleStartTime;
+        uint256 saleEndTime;
+        uint256 registerFee;
+        uint16 sharePercent;
+        RoundType roundType;
+        // only public round
+        uint256 minStaking;
+        uint256 maxRegister;
+        // not input params
+        uint256 allocPoint;
+        uint256 totalSold;
+        uint256 totalRegisted;
+    }
+
+    struct AirdropRound {
+        bool isInit;
+        uint256 claimTime;
+        uint16 sharePercent;
+        uint256 allocPoint;
+        uint256 totalRegisted;
+    }
+
+    struct StakingLevel {
+        uint16 level;
+        uint256 minStaking;
+        uint256 maxStaking;
+        uint256 weight;
+    }
+
+    struct FloorPriceProtect {
+        bool isInit;
+        uint256 floorPrice;
+        uint256 protectTimeLong;
+        uint256 protectSharePercent;
+    }
+
+    struct PartnerUnlock {
+        uint256 unlockTime;
+        uint256 unlockPercent;
+    }
+
+    struct BuyReward {
+        bool isInit;
+        uint256 totalReward;
+        uint256 rewardUnlockTime;
+    }
+
+    struct PartnerInfo {
+        address receiver;
+        uint256 firstUnlockPercent;
+        uint256 withdrawFee;
+        uint256 firstWithdraw;
+    }
+
+    // Supports two - digit decimals
+    uint256 public constant PERCENT_DECIMALS = 10000;
+    // 总共初始化了多少项
+    uint256 public totalInit;
+
+    IAdmin public admin;
+    IConfig public config;
+
+    IERC20 public token;
+    uint256 public buyFee;
+    uint256 public tokenPriceInCube;
+    uint256 public totalTokenAmount;
+
+    RoundInfo[] public rounds;
+    mapping(RoundType => RoundInfo) public roundMap;
+    AirdropRound public airdropRound;
+    StakingLevel[] public stakingLevels;
+    // level => StakingLevel
+    mapping(uint16 => StakingLevel) stakingLevelMap;
+    FloorPriceProtect public floorPriceProtect;
+    BuyReward public buyReward;
+
+    PartnerInfo public partner;
+    PartnerUnlock[] public partnerUnlocks;
+    uint256 public totalLocked;
+
+    event DepositToken(address token, uint256 amount);
+
+    constructor(
+        address _admin,
+        address _config,
+        address _token,
+        uint256 _buyFee,
+        uint256 _tokenPriceInCube,
+        uint256 _totalTokenAmount
+    ) {
+        admin = IAdmin(_admin);
+        config = IConfig(_config);
+        token = IERC20(_token);
+        buyFee = _buyFee;
+        tokenPriceInCube = _tokenPriceInCube;
+        totalTokenAmount = _totalTokenAmount;
+    }
+
+    modifier onlySaleAdmin() {
+        require(admin.isSaleAdmin(msg.sender), "not admin");
+        _;
+    }
+
+    modifier onlySaleConfigOrSignatureMaker() {
+        require(admin.isSaleAdmin(msg.sender) || config.isSignatureMakerAddress(msg.sender));
+        _;
+    }
+
+    // 设置回合
+    function setRounds(RoundInfo[] calldata _rounds) external onlySaleAdmin {
+        require(rounds.length == 0, "rounds has been initialized");
+        require(_rounds.length == 3);
+
+        require(_rounds[0].roundType == RoundType.ValidatorRound);
+        require(_rounds[1].roundType == RoundType.StakingRound);
+        require(_rounds[2].roundType == RoundType.PublicRound);
+
+        uint16 totalSharePercent;
+        for (uint256 i = 0; i < _rounds.length; i++) {
+            RoundInfo memory round = _rounds[i];
+            require(round.registerStartTime > block.timestamp);
+            require(round.registerStartTime < round.registerEndTime);
+            require(round.registerEndTime < round.saleStartTime);
+            require(round.saleStartTime < round.saleEndTime);
+            require(round.sharePercent <= PERCENT_DECIMALS);
+            if (i > 0) {
+                require(_rounds[i - 1].saleEndTime < _rounds[i].registerStartTime);
+            }
+            totalSharePercent += round.sharePercent;
+
+            // share percent: 1 ~ 100 / 100
+            round.allocPoint = totalTokenAmount.mul(round.sharePercent).div(PERCENT_DECIMALS);
+            round.totalSold = 0;
+            round.totalRegisted = 0;
+
+            rounds.push(round);
+            roundMap[round.roundType] = round;
+        }
+        require(totalSharePercent <= PERCENT_DECIMALS);
+        // total init
+        totalInit++;
+    }
+
+    // 设置空投回合
+    function setAirdropRound(uint256 _claimTime, uint16 _sharePercent) external onlySaleAdmin {
+        require(!airdropRound.isInit);
+        require(rounds.length > 0);
+        require(_claimTime > roundMap[RoundType.PublicRound].saleEndTime);
+        uint16 totalPercent;
+        for (uint256 i = 0; i < rounds.length; i++) {
+            totalPercent += rounds[i].sharePercent;
+        }
+        totalPercent += _sharePercent;
+        require(totalPercent == PERCENT_DECIMALS);
+
+        airdropRound = AirdropRound({
+            isInit: true,
+            claimTime: _claimTime,
+            sharePercent: _sharePercent,
+            allocPoint: totalTokenAmount.mul(_sharePercent).div(PERCENT_DECIMALS),
+            totalRegisted: 0
+        });
+        totalInit++;
+    }
+
+    // 设置质押等级
+    function setStakingLevel(StakingLevel[] calldata _stakingLevels) external onlySaleAdmin {
+        require(stakingLevels.length == 0);
+        require(_stakingLevels.length > 0);
+        for (uint256 i = 0; i < _stakingLevels.length; i++) {
+            require(_stakingLevels[i].minStaking < _stakingLevels[i].maxStaking);
+            require(_stakingLevels[i].level > 0, "level > 0 required");
+            require(_stakingLevels[i].weight > 0, "weight > 0 requied");
+
+            if (i > 0) {
+                require(_stakingLevels[i - 1].maxStaking <= _stakingLevels[i].minStaking);
+                require(_stakingLevels[i - 1].level < _stakingLevels[i].level);
+            }
+            stakingLevels.push(_stakingLevels[i]);
+            stakingLevelMap[_stakingLevels[i].level] = _stakingLevels[i];
+        }
+
+        totalInit++;
+    }
+
+    // 设置项目方提款配置
+    function setPartnerWithdraw(
+        address payable _receiver,
+        uint16 _firstUnlockPercent,
+        uint256 _withdrawFee,
+        uint256 _floorPrice,
+        uint256 _protectTimeLong,
+        uint256 _protectSharePercent,
+        PartnerUnlock[] calldata _partnerUnlocks
+    ) external onlySaleAdmin {
+        require(rounds.length > 0);
+        require(_receiver != address(0));
+        require(partner.receiver == address(0));
+        require(_firstUnlockPercent + _protectSharePercent <= PERCENT_DECIMALS);
+        uint256 totalPercent;
+        if (_partnerUnlocks.length > 0) {
+            require(_partnerUnlocks[0].unlockTime > rounds[rounds.length - 1].saleEndTime);
+        }
+        for (uint256 i = 0; i < _partnerUnlocks.length; i++) {
+            if (i > 0) {
+                require(_partnerUnlocks[i - 1].unlockTime < _partnerUnlocks[i].unlockTime);
+            }
+
+            require(_partnerUnlocks[i].unlockPercent <= PERCENT_DECIMALS);
+            totalPercent = totalPercent.add(_partnerUnlocks[i].unlockPercent);
+            partnerUnlocks.push(_partnerUnlocks[i]);
+        }
+        require(totalPercent == PERCENT_DECIMALS);
+
+        partner.receiver = _receiver;
+        partner.firstUnlockPercent = _firstUnlockPercent;
+        partner.withdrawFee = _withdrawFee;
+
+        floorPriceProtect.isInit = true;
+        floorPriceProtect.floorPrice = _floorPrice;
+        floorPriceProtect.protectTimeLong = _protectTimeLong;
+        floorPriceProtect.protectSharePercent = _protectSharePercent;
+
+        totalInit++;
+    }
+
+    // 交易挖矿奖励
+    function setBuyRewards(uint256 _totalReward, uint256 _rewardUnlockTime) external onlySaleAdmin {
+        require(!buyReward.isInit);
+        require(rounds.length > 0, "rounds not set");
+        require(_rewardUnlockTime > roundMap[RoundType.PublicRound].saleEndTime);
+        buyReward.isInit = true;
+        buyReward.totalReward = _totalReward;
+        buyReward.rewardUnlockTime = _rewardUnlockTime;
+
+        totalInit++;
+    }
+
+    // 存入销售token
+    function depositToken() external onlySaleConfigOrSignatureMaker {
+        require(token.balanceOf(address(this)) == 0);
+        token.safeTransferFrom(msg.sender, address(this), totalTokenAmount);
+
+        totalInit++;
+        emit DepositToken(address(token), totalTokenAmount);
+    }
+
+    // 查询方法
+    function getStakingLevels() external view returns (StakingLevel[] memory) {
+        return stakingLevels;
+    }
+}
+
+
+// File contracts/interfaces/IStaking.sol
+
+//-License-Identifier: UNLICENSED
+pragma solidity ^0.8.3;
+
+interface IStaking {
+
+    enum AssetType{NORMAL, IDO}
+
+    event Deposit(address indexed user, AssetType indexed assetType, uint256 amount);
+
+    event Withdraw(address indexed user, AssetType indexed assetType, uint256 amount, uint256 penaltyFee);
+
+    function unstake(uint256 _amount) external;
+
+    function stake(uint256 _amount) external;
+
+    // call by sale-module only
+    function idoStake(address _buyer, uint256 _idoExpiredTime) external returns (uint256 amount);
+
+    function idoUnstake(uint256 _amount) external;
+
+    function blendingUnstake(uint256 _amount) external;
+
+    // call by sale-reward-module only
+    function idoRewardStake(address _rewardStaker, uint256 _amount) external;
+
+    function userStakingAmount(address _user) external view returns (uint256);
+
+}
+
+
+// File contracts/interfaces/IUser.sol
+
+//-License-Identifier: UNLICENSED
+pragma solidity ^0.8.3;
+
+interface IUser {
+    struct UserInfo {
+        address userAddress;
+        address validatorAddress; //如果是验证者账户，则为验证者地址，否则0地址
+        bool isWhitelisted;//是否白名单
+        bool isKyc;//已过kyc
+        bool isForbidden;//是否已禁止，
+    }
+
+    event UserInfoUpdated(address indexed userAddress, address validatorAddress, bool whitelisted, bool isKyc, bool isForbidden);
+    event UserKycStatusUpdated(address indexed userAddress, bool isKyc);
+    event UserValidatorAddressUpdated(address indexed userAddress, address validatorAddress);
+
+    //批量设置某用户的白名单状态
+    function setWhitelistedForUser(address[] memory userAddress, bool[] memory whiteListed) external;
+    //批量设置某用户的KYC状态
+    function setKycForUser(address[] memory userAddress, bool[] memory isKyc) external;
+    //批量设置某用户的禁止状态
+    function setForbiddenForUser(address[] memory userAddress, bool[] memory isForbidden) external;
+
+    function applyForKYC(uint256 deadline, bytes memory sig) external;
+
+    function applyForValidatorAddress(address user, string memory message, bytes memory sig) external;
+
+
+    function adminContract() external view returns (address);
+
+    function userDetails(address) external view returns (UserInfo memory);
+
+    function validatorToUser(address) external view returns (address);
+
+    //是否是有效的验证者
+    function isEnableValidator(address) external view returns (bool);
+
+    //是否是有效的KYC用户
+    function isEnableKycUser(address) external view returns (bool);
+
+}
+
+
+// File contracts/interfaces/IUniswapV2Pair.sol
+
+pragma solidity >=0.5.17;
+// -License-Identifier: GPL-3.0
+
+interface IUniswapV2Pair {
+    event Approval(address indexed owner, address indexed spender, uint value);
+    event Transfer(address indexed from, address indexed to, uint value);
+
+    function name() external pure returns (string memory);
+    function symbol() external pure returns (string memory);
+    function decimals() external pure returns (uint8);
+    function totalSupply() external view returns (uint);
+    function balanceOf(address owner) external view returns (uint);
+    function allowance(address owner, address spender) external view returns (uint);
+
+    function approve(address spender, uint value) external returns (bool);
+    function transfer(address to, uint value) external returns (bool);
+    function transferFrom(address from, address to, uint value) external returns (bool);
+
+    function DOMAIN_SEPARATOR() external view returns (bytes32);
+    function PERMIT_TYPEHASH() external pure returns (bytes32);
+    function nonces(address owner) external view returns (uint);
+
+    function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
+
+    event Mint(address indexed sender, uint amount0, uint amount1);
+    event Burn(address indexed sender, uint amount0, uint amount1, address indexed to);
+    event Swap(
+        address indexed sender,
+        uint amount0In,
+        uint amount1In,
+        uint amount0Out,
+        uint amount1Out,
+        address indexed to
+    );
+    event Sync(uint112 reserve0, uint112 reserve1);
+
+    function MINIMUM_LIQUIDITY() external pure returns (uint);
+    function factory() external view returns (address);
+    function token0() external view returns (address);
+    function token1() external view returns (address);
+    function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
+    function price0CumulativeLast() external view returns (uint);
+    function price1CumulativeLast() external view returns (uint);
+    function kLast() external view returns (uint);
+
+    function mint(address to) external returns (uint liquidity);
+    function burn(address to) external returns (uint amount0, uint amount1);
+    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
+    function skim(address to) external;
+    function sync() external;
+
+    function initialize(address, address) external;
+}
+
+
+// File contracts/interfaces/IPriceProtect.sol
+
+//-License-Identifier: UNLICENSED
+pragma solidity ^0.8.3;
+
+interface IPriceProtect {
+    function priceProtect(
+        IUniswapV2Pair tradePair,
+        address saleContractAddr,
+        uint256 useReservePercent,
+        uint256 dexFeeThousandthsRatio
+    ) external;
+    function depositFor() external payable;
+}
+
+
+// File contracts/interfaces/IDevReward.sol
+
+//-License-Identifier: UNLICENSED
+pragma solidity ^0.8.3;
+
+interface IDevReward {
+    function accumulateIDOStakingPenaltyFee(uint256 _amount) external;
+
+    function accumulateNormalStakingPenaltyFee(uint256 _amount) external;
+
+    function accRegisterFee() external payable;
+
+    function accUserBuyingFee(address _token, uint256 _tokenAmount) external;
+
+    function accPartnerWithdrawFeeOfCube() external payable;
+
+    function accPartnerWithdrawFee(
+        address _idoSale,
+        address _token,
+        uint256 _tokenAmount
+    ) external payable;
+
+    function withdrawRegisterFee() external;
+
+    function withdrawIDOStakingPenaltyFee(uint256 _amount) external;
+
+    function withdrawNormalStakingPenaltyFee(uint256 _amount) external;
+
+    function withdrawRegisterFee(uint256 _amount) external;
+
+    function withdrawUserBuyFee(address _token, uint256 _amount) external;
+
+    function withdrawPartnerFeeOfCube(uint256 _amount) external;
+
+    function withdrawPartnerFeeOfToken(address _token, uint256 _tokenAmount) external;
+}
+
+
+// File contracts/sale/Sale.sol
+
+//-License-Identifier: Unlicense
+pragma solidity ^0.8.3;
+
+
+
+
+
+
+
+
+contract Sale is SaleConfig {
+    using SafeERC20 for IERC20;
+    using SafeMath for uint256;
+
+    struct UserInfo {
+        RoundType roundType;
+        uint16 level;
+        uint256 boughtAmount;
+        uint256 airdropClaimed;
+        uint256 buyRewardClaimed;
+        uint256 withdraw;
+        uint256 userGet;
+    }
+
+    // check all initialize is complate
+    uint256 public constant REQUIRED_TOTAL_INIT = 6;
+
+    IStaking public staking;
+    IUser public user;
+    IDevReward public devReward;
+    IPriceProtect public priceProtect;
+    IERC20 public ivyl;
+
+    mapping(RoundType => mapping(address => bool)) registedRound;
+    mapping(address => UserInfo) public userInfo;
+    // level => total registed count
+    mapping(uint16 => uint256) public stakingLevelTotalRegisted;
+    uint256 public totalFundRaised;
+    uint256 public totalSold;
+    // totalFund used by bot
+    uint256 public totalReserveUsedByBot;
+    // is sale enable
+    bool public isEnable = false;
+
+    // events
+    event RegisterRound(address sender, RoundType roundType, uint256 registerFee);
+    event Buy(
+        address sender,
+        RoundType roundType,
+        uint256 payAmount,
+        uint256 boughtAmount,
+        uint256 fee
+    );
+    event ClaimAirdrop(address sender, uint256 claimAmount);
+    event UserWithdraw(address sender, uint256 withdrawAmount);
+    event PartnerWithdraw(address sender, address receiver, uint256 cubeAmount, uint256 fee);
+    event WithdrawAllFundRaise(address sender, address receiver, uint256 cubeAmount, uint256 fee);
+    event BackUnsoldTokens(address receiver, uint256 amount);
+    event ClaimBuyReward(address receiver, uint256 amount);
+    event DepositBuyRewardToStaking(address receiver, uint256 amount);
+
+    receive() external payable {}
+
+    constructor(
+        address _admin,
+        address _token,
+        uint256 _buyFee,
+        uint256 _tokenPriceInCube, // tokenPriceInCube = price * 1e18
+        uint256 _totalTokenAmount,
+        address _staking,
+        address _config,
+        address _user,
+        address _devReward,
+        address _priceProtect,
+        address _ivyl
+    ) SaleConfig(_admin, _config, _token, _buyFee, _tokenPriceInCube, _totalTokenAmount) {
+        staking = IStaking(_staking);
+        user = IUser(_user);
+        devReward = IDevReward(_devReward);
+        priceProtect = IPriceProtect(_priceProtect);
+        ivyl = IERC20(_ivyl);
+    }
+
+    modifier onlyStakingContract() {
+        require(msg.sender == address(staking), "require staking contract");
+        _;
+    }
+
+    modifier whenEnable() {
+        require(isEnable, "sale disabled");
+        _;
+    }
+
+    function enable() external onlySaleAdmin {
+        require(totalInit == REQUIRED_TOTAL_INIT, "config not complate");
+        isEnable = true;
+    }
+
+    function disable() external onlySaleAdmin {
+        isEnable = false;
+    }
+
+    function isEnableValidatorOrKycUser() public view returns (bool) {
+        return user.isEnableKycUser(msg.sender) || user.isEnableValidator(msg.sender);
+    }
+
+    // 注册期用户参与注册
+    function registerRound(RoundType _roundType) external payable whenEnable {
+        require(msg.sender == tx.origin);
+        require(!registedRound[_roundType][msg.sender], "already registed");
+        require(block.timestamp > config.getCoolingOffPeriodFor(msg.sender), "not cooling off");
+        RoundInfo storage round = roundMap[_roundType];
+        require(round.sharePercent > 0);
+        require(block.timestamp > round.registerStartTime);
+        require(block.timestamp < round.registerEndTime);
+        require(msg.value == round.registerFee, "insufficient registration fee");
+        if (round.roundType == RoundType.ValidatorRound) {
+            require(user.isEnableValidator(msg.sender));
+        }
+        if (round.roundType == RoundType.StakingRound) {
+            require(user.isEnableKycUser(msg.sender), "not kyc user");
+            // normal staking => ido staking
+            uint256 coolingOffExpTime = block.timestamp + config.getCoolingOffPeriod();
+            uint256 idoStakingAmount = staking.idoStake(msg.sender, coolingOffExpTime);
+
+            (uint16 level, bool success) = _checkStakingLevel(idoStakingAmount);
+            require(success);
+            userInfo[msg.sender].level = stakingLevelMap[level].level;
+            stakingLevelTotalRegisted[level]++;
+        }
+        if (round.roundType == RoundType.PublicRound) {
+            require(isEnableValidatorOrKycUser());
+            require(round.totalRegisted < round.maxRegister, "can't register more");
+            require(staking.userStakingAmount(msg.sender) >= round.minStaking);
+            require(userInfo[msg.sender].boughtAmount == 0);
+        }
+        round.totalRegisted++;
+        registedRound[round.roundType][msg.sender] = true;
+
+        // update cooling off exp time
+        config.updateCoolingOffPeriodFor(msg.sender, round.registerEndTime);
+        //transfer register fee to dev reward
+        devReward.accRegisterFee{value: msg.value}();
+
+        emit RegisterRound(msg.sender, _roundType, round.registerFee);
+    }
+
+    // 购买期用户参与购买
+    function buy(RoundType _roundType) external payable whenEnable {
+        require(msg.sender == tx.origin);
+        require(registedRound[_roundType][msg.sender]);
+        RoundInfo storage round = roundMap[_roundType];
+        require(round.sharePercent > 0);
+        require(block.timestamp > round.saleStartTime);
+        require(block.timestamp < round.saleEndTime);
+
+        uint256 allocPoint;
+        uint256 userAllocPoint;
+        uint256 userBuyingAmount;
+        uint256 boughtAmount = userInfo[msg.sender].boughtAmount;
+        /// @notice prevent double counting caused by repeated purchases by users
+        if (boughtAmount == 0) {
+            airdropRound.totalRegisted++;
+        }
+
+        if (_roundType == RoundType.ValidatorRound) {
+            userAllocPoint = round.allocPoint.div(round.totalRegisted);
+        }
+        if (_roundType == RoundType.StakingRound) {
+            // level => tokenAmount
+            allocPoint = getAllocPointOfStakingLevel(userInfo[msg.sender].level);
+            userAllocPoint = allocPoint.div(stakingLevelTotalRegisted[userInfo[msg.sender].level]);
+        }
+        if (_roundType == RoundType.PublicRound) {
+            /// @notice publicRoundAllocPoint = validatorRoundUnsold + stakingRoundUnsold + publicRoundShared
+            allocPoint = getPublicRoundRealAllocPoint();
+            userAllocPoint = allocPoint.div(round.totalRegisted);
+        }
+
+        /// @notice be careful of decimals conversion
+        userBuyingAmount = msg
+            .value
+            .mul(uint256(10)**IERC20Metadata(address(token)).decimals())
+            .div(tokenPriceInCube);
+
+        require(boughtAmount.add(userBuyingAmount) <= userAllocPoint);
+        require(userBuyingAmount > 0, "can't buy 0 tokens");
+
+        // 手续费转给devReward
+        uint256 buyingFee = userBuyingAmount.mul(buyFee).div(PERCENT_DECIMALS);
+        devReward.accUserBuyingFee(address(token), buyingFee);
+        token.safeTransfer(address(devReward), buyingFee);
+
+        // 计算用户实际可拿到的token数量
+        uint256 userGet = userBuyingAmount.sub(buyingFee);
+        round.totalSold = round.totalSold.add(userBuyingAmount);
+        userInfo[msg.sender].roundType = _roundType;
+        userInfo[msg.sender].boughtAmount = boughtAmount.add(userBuyingAmount);
+        userInfo[msg.sender].userGet = userInfo[msg.sender].userGet.add(userGet);
+
+        // 用于价格保护的资金
+        if (floorPriceProtect.protectSharePercent > 0) {
+            uint256 reserve = msg.value.mul(floorPriceProtect.protectSharePercent).div(
+                PERCENT_DECIMALS
+            );
+            totalReserveUsedByBot = totalReserveUsedByBot.add(reserve);
+            // deposit to SalePriceProtect contract
+            priceProtect.depositFor{value: reserve}();
+        }
+
+        // 统计总的募集资金额度
+        totalFundRaised = totalFundRaised.add(msg.value);
+        totalSold = totalSold.add(userBuyingAmount);
+        // 项目方首次提款额度 = 总募资额度 * 首次提款比例
+        partner.firstWithdraw = totalFundRaised.mul(partner.firstUnlockPercent).div(
+            PERCENT_DECIMALS
+        );
+        // 项目方分期释放总额度 = 总募资额度 - 首次提款额度 - 托底保护额度
+        totalLocked = totalFundRaised.sub(partner.firstWithdraw).sub(totalReserveUsedByBot);
+        // 更新冷却期
+        config.updateCoolingOffPeriodFor(
+            msg.sender,
+            block.timestamp + config.getCoolingOffPeriod()
+        );
+
+        emit Buy(msg.sender, _roundType, msg.value, userGet, buyingFee);
+    }
+
+    function claimAirdrop() external whenEnable {
+        require(userInfo[msg.sender].airdropClaimed == 0);
+        require(airdropRound.sharePercent > 0);
+        require(block.timestamp > airdropRound.claimTime);
+        require(userInfo[msg.sender].boughtAmount > 0);
+        require(airdropRound.totalRegisted > 0);
+
+        uint256 userAirdropReward = airdropRound.allocPoint.div(airdropRound.totalRegisted);
+        userInfo[msg.sender].airdropClaimed = userAirdropReward;
+
+        token.safeTransfer(msg.sender, userAirdropReward);
+
+        emit ClaimAirdrop(msg.sender, userAirdropReward);
+    }
+
+    // 领取交易挖矿奖励
+    function claimBuyReward() external whenEnable {
+        require(userInfo[msg.sender].buyRewardClaimed == 0, "already claimed");
+        uint256 reward = getBuyingRewards(msg.sender);
+        require(reward > 0);
+
+        userInfo[msg.sender].buyRewardClaimed = reward;
+        ivyl.transfer(msg.sender, reward);
+
+        emit ClaimBuyReward(msg.sender, reward);
+    }
+
+    // 将交易挖矿奖励存入staking合约
+    function depositBuyRewardToStaking() external whenEnable {
+        require(userInfo[msg.sender].buyRewardClaimed == 0, "already claimed");
+        uint256 reward = getBuyingRewards(msg.sender);
+        require(reward > 0);
+        userInfo[msg.sender].buyRewardClaimed = reward;
+
+        ivyl.approve(address(staking), reward);
+        staking.idoRewardStake(msg.sender, reward);
+        emit DepositBuyRewardToStaking(address(staking), reward);
+    }
+
+    // 用户提取已购买代币
+    function userWithdraw() external whenEnable {
+        require(userInfo[msg.sender].withdraw == 0);
+        require(userInfo[msg.sender].boughtAmount > 0);
+        require(block.timestamp > roundMap[RoundType.PublicRound].saleEndTime);
+
+        userInfo[msg.sender].withdraw = userInfo[msg.sender].userGet;
+        // 减去手续费后用户真实获得
+        token.transfer(msg.sender, userInfo[msg.sender].userGet);
+
+        emit UserWithdraw(msg.sender, userInfo[msg.sender].userGet);
+    }
+
+    // 项目方提款
+    function partnerWithdraw() external onlySaleAdmin {
+        if (partner.firstWithdraw > 0) {
+            _partnerWithdrawFirst();
+        } else {
+            _partnerWithdrawPeriod();
+        }
+    }
+
+    // 更新质押回合等级
+    function updateIdoStaking(address _account, uint256 _leftIDOSakingAmount)
+        external
+        onlyStakingContract
+    {
+        (uint16 newLevel, bool success) = _checkStakingLevel(_leftIDOSakingAmount);
+        uint16 oldLevel = userInfo[_account].level;
+        if (oldLevel > 0) {
+            stakingLevelTotalRegisted[oldLevel]--;
+        }
+        if (success) {
+            // new level
+            userInfo[_account].level = stakingLevelMap[newLevel].level;
+            stakingLevelTotalRegisted[newLevel]++;
+        } else {
+            // exit register
+            userInfo[_account].level = 0;
+            registedRound[RoundType.StakingRound][_account] = false;
+        }
+    }
+
+    /// @notice 如果项目方代币前期表现较好，允许项目方剩余锁仓提前释放
+    function withdrawAllReamingFundRaise() external onlySaleAdmin {
+        require(partnerUnlocks.length > 0);
+        uint256 totalAmount;
+        for (uint256 i = 0; i < partnerUnlocks.length; i++) {
+            totalAmount = totalAmount.add(
+                totalLocked.mul(partnerUnlocks[i].unlockPercent).div(PERCENT_DECIMALS)
+            );
+        }
+        uint256 fee = totalAmount.mul(partner.withdrawFee).div(PERCENT_DECIMALS);
+        uint256 partnerGet = totalAmount.sub(fee);
+
+        payable(partner.receiver).transfer(partnerGet);
+        delete partnerUnlocks;
+        emit WithdrawAllFundRaise(msg.sender, partner.receiver, totalAmount, fee);
+    }
+
+    // internal functions
+    function _checkStakingLevel(uint256 _stakingAmount)
+        internal
+        view
+        returns (uint16 level, bool success)
+    {
+        // staking levels not set
+        if (stakingLevels.length == 0) {
+            return (0, false);
+        }
+        // staking < min staking
+        if (_stakingAmount < stakingLevels[0].minStaking) {
+            return (0, false);
+        }
+        // staking > max staking <==> max level
+        if (_stakingAmount >= stakingLevels[stakingLevels.length - 1].maxStaking) {
+            return (stakingLevels[stakingLevels.length - 1].level, true);
+        }
+        for (uint256 i = 0; i < stakingLevels.length; i++) {
+            if (
+                _stakingAmount >= stakingLevels[i].minStaking &&
+                _stakingAmount < stakingLevels[i].maxStaking
+            ) {
+                return (stakingLevels[i].level, true);
+            }
+        }
+    }
+
+    function _backUnsoldTokens(address _receiver) internal {
+        uint256 unsold = totalTokenAmount.sub(totalSold);
+        if (unsold > 0) {
+            token.transfer(_receiver, unsold);
+            emit BackUnsoldTokens(_receiver, unsold);
+        }
+    }
+
+    // 项目方首次提款
+    function _partnerWithdrawFirst() internal {
+        require(partner.firstWithdraw > 0);
+        require(block.timestamp > roundMap[RoundType.PublicRound].saleEndTime);
+        // compute withdraw fee
+        uint256 fee = partner.firstWithdraw.mul(partner.withdrawFee).div(PERCENT_DECIMALS);
+        devReward.accPartnerWithdrawFeeOfCube{value: fee}();
+
+        // partner get
+        uint256 partnerGet = partner.firstWithdraw.sub(fee);
+        payable(partner.receiver).transfer(partnerGet);
+
+        partner.firstWithdraw = 0;
+
+        // 将没有销售完的代币退回给项目方
+        _backUnsoldTokens(partner.receiver);
+
+        emit PartnerWithdraw(msg.sender, partner.receiver, partnerGet, fee);
+    }
+
+    // 项目方募资代币分期释放
+    function _partnerWithdrawPeriod() internal {
+        require(totalLocked > 0);
+        require(partnerUnlocks.length > 0);
+        require(block.timestamp > partnerUnlocks[0].unlockTime);
+        uint256 withdrawAmount = totalLocked.mul(partnerUnlocks[0].unlockPercent).div(
+            PERCENT_DECIMALS
+        );
+
+        uint256 fee = withdrawAmount.mul(partner.withdrawFee).div(PERCENT_DECIMALS);
+        devReward.accPartnerWithdrawFeeOfCube{value: fee}();
+
+        uint256 partnerGet = withdrawAmount.sub(fee);
+
+        // remove partnerUnlocks[0]
+        for (uint256 i = 0; i < partnerUnlocks.length; i++) {
+            if (i > 0) {
+                partnerUnlocks[i - 1] = partnerUnlocks[i];
+            }
+        }
+        partnerUnlocks.pop();
+
+        // transfer to withdraw address
+        payable(partner.receiver).transfer(partnerGet);
+
+        emit PartnerWithdraw(msg.sender, partner.receiver, withdrawAmount, fee);
+    }
+
+    /// @notice 下面是查询方法
+    function getAllocPointOfStakingLevel(uint16 _level) public view returns (uint256) {
+        uint256 totalWeight;
+        for (uint256 i = 0; i < stakingLevels.length; i++) {
+            // totalWeight = totalWeight.add(b);
+            totalWeight = totalWeight.add(
+                stakingLevels[i].weight.mul(stakingLevelTotalRegisted[stakingLevels[i].level])
+            );
+        }
+        require(totalWeight > 0);
+        uint256 averageWeight = roundMap[RoundType.StakingRound].allocPoint.div(totalWeight);
+        return
+            stakingLevelTotalRegisted[_level].mul(averageWeight).mul(
+                stakingLevelMap[_level].weight
+            );
+    }
+
+    function getPublicRoundRealAllocPoint() public view returns (uint256) {
+        RoundInfo memory publicRound = roundMap[RoundType.PublicRound];
+        RoundInfo memory validatorRound = roundMap[RoundType.ValidatorRound];
+        RoundInfo memory stakingRound = roundMap[RoundType.StakingRound];
+        return
+            publicRound.allocPoint.add(validatorRound.allocPoint.sub(validatorRound.totalSold)).add(
+                stakingRound.allocPoint.sub(stakingRound.totalSold)
+            );
+    }
+
+    function isRegistedRound(RoundType _round, address _account) external view returns (bool) {
+        return registedRound[_round][_account];
+    }
+
+    function getBuyingRewards(address _account) public view returns (uint256) {
+        // BuyInfo memory boughtInfo = bought[_account];
+        if (userInfo[_account].boughtAmount == 0) {
+            return 0;
+        }
+
+        // staking round = totalReward * 85% * (boughtAmount / stakingRoundTotalSold)
+        if (userInfo[_account].roundType == RoundType.StakingRound) {
+            return
+                buyReward.totalReward.mul(85).div(100).mul(userInfo[_account].boughtAmount).div(
+                    roundMap[RoundType.StakingRound].totalSold
+                );
+        }
+
+        if (userInfo[_account].roundType == RoundType.PublicRound) {
+            return
+                buyReward.totalReward.mul(15).div(100).mul(userInfo[_account].boughtAmount).div(
+                    roundMap[RoundType.PublicRound].totalSold
+                );
+        }
+
+        return 0;
+    }
+
+    function getAirdropRewards(address _account) external view returns (uint256) {
+        if (userInfo[_account].boughtAmount > 0) {
+            return airdropRound.allocPoint.div(airdropRound.totalRegisted);
+        }
+        return 0;
+    }
+
+    // query partner withdraw amount
+    function getPartnerWithdrawAmount() external view returns (uint256) {
+        if (partner.firstWithdraw > 0) {
+            return partner.firstWithdraw;
+        } else {
+            if (partnerUnlocks.length == 0) {
+                return 0;
+            }
+            return totalLocked.mul(partnerUnlocks[0].unlockPercent).div(PERCENT_DECIMALS);
+        }
+    }
+}
